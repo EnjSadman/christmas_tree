@@ -1,3 +1,29 @@
 :root {
+  --default-margin: 0;
+  --default-padding: 0;
+  --default-font-size: 1rem;
+  --default-line-height: 1;
+}
+
+* {
+  margin: var(--default-margin);
+  padding: var(--default-padding);
+  line-height: var(--default-line-height);
+  font-size: var(--default-font-size);
+  box-sizing: border-box;
+}
+
+body {
   background-color: black;
+  color: greenyellow;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.controls {
+
 }
