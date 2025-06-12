@@ -2,12 +2,12 @@ function main() {
   const widthInput = document.getElementById("tree_width");
   const heightInput = document.getElementById("tree_height");
 
-  const treePreElement = document.getElementById("tree");
+  const treeContainer = document.getElementById("tree_container");
 
   const width = Math.max(1, parseInt(widthInput.value, 10) || 1);
   const height = Math.max(1, parseInt(heightInput.value, 10) || 1);
 
-  const board = new DrawBoard(width, height, treePreElement);
+  const board = new DrawBoard(width, height, treeContainer);
 
   widthInput.addEventListener("input", (e) =>
     board.setWidth(Number(e.target.value) || 1)
@@ -16,6 +16,7 @@ function main() {
     board.setHeight(Number(e.target.value) || 1)
   );
 
+  board.prepareContainer();
   board.draw();
 }
 
@@ -24,7 +25,7 @@ class DrawBoard {
     (this.height = height),
       (this.width = width),
       (this.mainElement = mainElement);
-    this.mode = "square";
+    this.mode = "triangle";
   }
 
   changeMode(newMode) {
@@ -47,34 +48,62 @@ class DrawBoard {
     this.draw();
   }
 
+  prepareContainer() {
+    for (let i = 0; i < this.height; i++) {
+      const newPre = document.createElement("pre");
+      newPre.id = `pre_${i}`;
+      this.mainElement.appendChild(newPre);
+    }
+  }
+
   draw() {
-    let asciiArt = "";
+    switch (this.mode) {
+      case "triangle": {
+        console.log("making triangle");
+        let firstSymbolPosition = this.width / 2 - 1;
+        let secondSymbolPosition = this.width / 2;
+        for (let i = 0; i < this.height / 2; i++) {
+          const line = document.getElementById(`pre_${i}`);
+          let asciiArt = "";
 
-    if (this.width === 1 && this.height === 1) {
-      asciiArt = "_";
-    } else if (this.width === 1) {
-      for (let i = 0; i < this.height; i++) {
-        asciiArt += "|\n";
-      }
-    } else if (this.height === 1) {
-      for (let j = 0; j < this.width; j++) {
-        asciiArt += "_";
-      }
-    } else {
-      for (let j = 0; j < this.width; j++) {
-        asciiArt += "_";
-      }
-      asciiArt += "\n";
+          for (let j = 0; j < this.width; j++) {
+            if (j === firstSymbolPosition && i + 1 !== this.height) {
+              asciiArt += "/";
+            } else if (j === secondSymbolPosition && i + 1 !== this.height) {
+              asciiArt += "\\";
+            } else if (i + 1 !== this.height / 2) {
+              asciiArt += " ";
+            } else {
+              asciiArt += "_";
+            }
+          }
 
-      for (let i = 1; i < this.height - 1; i++) {
-        asciiArt += "|";
-        for (let j = 1; j < this.width - 1; j++) {
-          asciiArt += " ";
+          firstSymbolPosition--;
+
+          secondSymbolPosition++;
+
+          line.innerHTML = asciiArt;
         }
-        asciiArt += "|\n";
+        break;
       }
-      for (let j = 0; j < this.width; j++) {
-        asciiArt += "_";
+      default: {
+        console.log("making square");
+        for (let i = 0; i < this.height; i++) {
+          const line = document.getElementById(`pre_${i}`);
+          let asciiArt = "";
+          for (let j = 0; j < this.width; j++) {
+            if (i === 0 || i === this.height - 1) {
+              asciiArt += "_";
+            } else {
+              if (j === 0 || j === this.width - 1) {
+                asciiArt += "|";
+              } else {
+                asciiArt += " ";
+              }
+            }
+          }
+          line.innerHTML = asciiArt;
+        }
       }
     }
     this.mainElement.textContent = asciiArt;
